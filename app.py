@@ -22,9 +22,9 @@ def get_item(item_id):
 @app.route('/items', methods=['POST'])
 def create_item():
     data = request.get_json()
-    if not data or not 'name' in data:
-        abort(400, description=data.get('description'))
-    item = Item(name=data['name'], description=data.get('description'))
+    if not data or not 'name' in data and not data['name'].strip():
+        abort(400, description='Name is required and cannot be empty')
+    item = Item(name=data['name'].strip(), description=data.get('description').strip())
     db.session.add(item)
     db.session.commit()
     return jsonify(item.to_dict()), 201
@@ -33,10 +33,10 @@ def create_item():
 def update_item(item_id):
     item = Item.query.get_or_404(item_id)
     data = request.get_json()
-    if not data or not 'name' in data:
-        abort(400, description='Name is required')
-    item.name = data['name']
-    item.description = data.get('description')
+    if not data or not 'name' in data and not data['name'].strip():
+        abort(400, description='Name is required and cannot be empty')
+    item.name = data['name'].strip()
+    item.description = data.get('description').strip()
     db.session.commit()
     return jsonify(item.to_dict()), 200
 
